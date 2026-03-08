@@ -8,6 +8,10 @@ MoneyForward の CSV を取り込み、ルールベースで正規化し、DuckD
   - MoneyForward CSV を読み込む
   - `owner`, `expense_type`, `is_transfer` をルールベースで補正する
   - DuckDB に重複排除しながら保存する
+- `ingest-mf-scrape`
+  - Chrome MCP / Playwright などで取得した MoneyForward 明細 JSON を読み込む
+  - `owner`, `expense_type`, `is_transfer` をルールベースで補正する
+  - DuckDB に重複排除しながら保存する
 - `report-monthly`
   - 指定月の支出サマリーを Markdown で出力する
 
@@ -25,6 +29,11 @@ go run ./cmd/kakei-advisor ingest-moneyforward \
   --db data/finance.duckdb \
   --rules config/default_rules.json
 
+go run ./cmd/kakei-advisor ingest-mf-scrape \
+  --input data/raw/mf_scrape_2026-03.json \
+  --db data/finance.duckdb \
+  --rules config/default_rules.json
+
 go run ./cmd/kakei-advisor report-monthly \
   --db data/finance.duckdb \
   --month 2026-03 \
@@ -35,4 +44,3 @@ go run ./cmd/kakei-advisor report-monthly \
 
 - 詳細は `docs/implementation-plan.md`
 - Obsidian 側の構想メモは別 repo のノートに管理
-

@@ -1,7 +1,7 @@
 bin/
 dist/
+# Personal finance raw data and local databases must never be committed.
 data/
 reports/
 *.duckdb
 *.duckdb.wal
-

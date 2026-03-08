@@ -13,6 +13,7 @@ MoneyForward を収集ハブとして使い、CSV が手元にある前提で以
 ### コマンド
 
 - `ingest-moneyforward`
+- `ingest-mf-scrape`
 - `report-monthly`
 
 ### データモデル
@@ -52,4 +53,3 @@ MoneyForward を収集ハブとして使い、CSV が手元にある前提で以
 2. ルールファイルを本人用に初期化する
 3. 月次レポートの項目を増やす
 4. Agent からこの CLI を呼ぶ導線を作る
-

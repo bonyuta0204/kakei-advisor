@@ -21,6 +21,8 @@ func Run(args []string) error {
 	switch args[0] {
 	case "ingest-moneyforward":
 		return runIngestMoneyForward(args[1:])
+	case "ingest-mf-scrape":
+		return runIngestMFScrape(args[1:])
 	case "report-monthly":
 		return runReportMonthly(args[1:])
 	case "-h", "--help", "help":
@@ -49,6 +51,44 @@ func runIngestMoneyForward(args []string) error {
 		return err
 	}
 	transactions, err := moneyforward.ParseCSV(*input, rules)
+	if err != nil {
+		return err
+	}
+
+	repo, err := storage.Open(*dbPath)
+	if err != nil {
+		return err
+	}
+	defer repo.Close()
+
+	inserted, err := repo.InsertTransactions(transactions)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("ingested=%d parsed=%d db=%s\n", inserted, len(transactions), *dbPath)
+	return nil
+}
+
+func runIngestMFScrape(args []string) error {
+	fs := flag.NewFlagSet("ingest-mf-scrape", flag.ContinueOnError)
+	input := fs.String("input", "", "path to scraped MoneyForward JSON")
+	dbPath := fs.String("db", "data/finance.duckdb", "path to DuckDB file")
+	rulesPath := fs.String("rules", "config/default_rules.json", "path to rules JSON")
+	fs.SetOutput(os.Stdout)
+
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+	if *input == "" {
+		return errors.New("ingest-mf-scrape requires --input")
+	}
+
+	rules, err := config.LoadRules(*rulesPath)
+	if err != nil {
+		return err
+	}
+	transactions, err := moneyforward.ParseScrapeJSON(*input, rules)
 	if err != nil {
 		return err
 	}
@@ -112,5 +152,6 @@ func usageError() error {
 func usageText() string {
 	return `Usage:
   kakei-advisor ingest-moneyforward --input <csv> [--db <duckdb>] [--rules <json>]
+  kakei-advisor ingest-mf-scrape --input <json> [--db <duckdb>] [--rules <json>]
   kakei-advisor report-monthly --month YYYY-MM [--db <duckdb>] [--output <file>]`
 }
