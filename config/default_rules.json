@@ -1,0 +1,45 @@
+{
+  "owner_rules": [
+    {
+      "field": "payment_method",
+      "match": "contains",
+      "pattern": "共用",
+      "value": "shared"
+    },
+    {
+      "field": "source_account",
+      "match": "contains",
+      "pattern": "共用",
+      "value": "shared"
+    }
+  ],
+  "expense_type_rules": [
+    {
+      "field": "category",
+      "match": "contains",
+      "pattern": "サブスク",
+      "value": "fixed"
+    },
+    {
+      "field": "merchant",
+      "match": "contains",
+      "pattern": "Netflix",
+      "value": "fixed"
+    }
+  ],
+  "transfer_rules": [
+    {
+      "field": "merchant",
+      "match": "contains",
+      "pattern": "PASMOチャージ",
+      "value": true
+    },
+    {
+      "field": "merchant",
+      "match": "contains",
+      "pattern": "楽天Payチャージ",
+      "value": true
+    }
+  ]
+}
+
