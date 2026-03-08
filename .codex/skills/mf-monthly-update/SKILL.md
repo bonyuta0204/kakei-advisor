@@ -11,17 +11,30 @@ Use this skill for the normal monthly refresh after the initial backfill is done
 
 - Work only in this repository.
 - Do not commit anything under `data/`.
+- Read `/Users/yuta.nakamura/.codex/memories/kakei-advisor.md` before interpreting household context or classifying ambiguous rows.
 - The user logs in to MoneyForward manually.
 - Use Chrome MCP for browser interaction.
 - Use the local Go CLI for ingest and reporting.
+- Prefer the authenticated same-origin `POST /cf/fetch` response when it is available, because it returns the same visible rows as the household ledger table without brittle UI scraping.
 
 ## Default workflow
 
 1. Ask the user to log in to MoneyForward if not already logged in.
 2. Open `https://moneyforward.com/cf`.
 3. Move to the requested month. Default to the current month if the user does not specify one.
-4. Scrape the visible transaction table.
-5. Save the payload to `data/raw/mf_scrape_YYYY-MM.json`.
+4. Prefer the `cf/fetch` fast path for the target month.
+   - Trigger `POST /cf/fetch` from the authenticated page.
+   - Save the raw response as `data/raw/_mf_fetch_YYYY-MM.js`.
+   - Convert it with:
+
+```bash
+node .codex/skills/mf-backfill/scripts/mf_fetch_to_scrape_json.js data/raw/_mf_fetch_YYYY-MM.js
+```
+
+   - This writes `data/raw/mf_scrape_YYYY-MM.json`.
+5. Fallback only if `cf/fetch` is unavailable.
+   - Scrape the visible transaction table directly from the DOM.
+   - Save the payload to `data/raw/mf_scrape_YYYY-MM.json`.
 6. Run:
 
 ```bash
@@ -39,6 +52,9 @@ go run ./cmd/kakei-advisor report-monthly --db data/finance.duckdb --month YYYY-
 
 - Run ingest and report sequentially.
 - Treat scrape JSON as the raw source of truth for that month.
+- `cf/fetch` is acceptable because it is the same visible-table data source the page uses after login. Do not switch to export endpoints.
+- Use the private memory file only as interpretation context. Do not write it back into repository files.
+- Confirm the returned `range` and `row_count` before ingest.
 - If the visible table clearly does not contain all expected rows, stop and tell the user what is incomplete.
 - If categories or owner rules look wrong, suggest updating `config/default_rules.json` instead of hardcoding exceptions in the prompt.
 
@@ -46,6 +62,6 @@ go run ./cmd/kakei-advisor report-monthly --db data/finance.duckdb --month YYYY-
 
 - Mention the target month explicitly.
 - Mention the path of the raw JSON file.
+- Mention whether temporary `_mf_fetch_YYYY-MM.js` files remain or were cleaned up.
 - Mention the exact CLI commands used.
 - Do not commit or push unless the user explicitly asks.
-

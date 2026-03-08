@@ -1,0 +1,5 @@
+version: 1
+interface:
+  display_name: Household Finance Analysis
+  short_description: Analyze the repo's household-finance DuckDB using private memory for context.
+  default_prompt: Analyze this repository's household-finance data using the private memory file first, then answer questions about income capture, spending patterns, savings targets, and classification gaps with clear caveats.
