@@ -1,0 +1,6 @@
+version: 1
+interface:
+  display_name: MoneyForward Backfill
+  short_description: Backfill past MoneyForward months into DuckDB for this repo.
+  default_prompt: Backfill past MoneyForward months in this repository by scraping one month at a time after manual login, saving JSON under data/raw, ingesting with the local Go CLI, and reporting progress clearly.
+

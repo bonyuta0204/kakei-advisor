@@ -1,0 +1,5 @@
+version: 1
+interface:
+  display_name: MoneyForward Monthly Update
+  short_description: Run the monthly MoneyForward scrape, ingest, and report flow for this repo.
+  default_prompt: Run the recurring monthly MoneyForward update in this repository by scraping the requested month after manual login, saving JSON under data/raw, ingesting it with the local Go CLI, generating the monthly report, and summarizing the result.
